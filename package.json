@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "eciesjs": "^0.3.16",
+    "lotion": "^0.4.27"
+  }
+}
