@@ -9,17 +9,22 @@ let app = lotion({
 
 app.use(function(state, tx) {
     let msg = JSON.parse(tx.nonce)
-    state.msgs[msg.pubKeyHex] = {}
-    state.msgs[msg.pubKeyHex][Date.now()] = {
+    let newMsg = {}
+    newMsg[Date.now()] = {
         privKeyHex: msg.privKeyHex,
         encryptedMsg: msg.encryptedMsg,
         decryptedMsg: msg.decryptedMsg
     }
+    if(msg.command === "add") {
+        state.msgs[msg.pubKeyHex] = newMsg
+    }
+
+    if(msg.command === "delete") {
+        console.log("delete command")
+    }
+
 })
 
-app.useBlock(function(state) {
-    console.log(state.msgs)
-})
 
 app.start().then(function(appInfo) {
     console.log(`app started. gci: ${appInfo.GCI}`)
