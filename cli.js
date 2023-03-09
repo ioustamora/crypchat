@@ -65,7 +65,7 @@ async function getAddrMsgs(GCI, keyObj) {
         for (let index in msgList) {
             let msg = msgList[index]
             console.log(index, " : ", msg)
-            let decriptefm = decryptMsg(msg.encryptedMsg, keyObj.privKeyHex)
+            let decriptefm = decryptMsg(msg.msg, keyObj.privKeyHex)
             console.log(decriptefm)
         }
     } catch (error) {
@@ -73,7 +73,20 @@ async function getAddrMsgs(GCI, keyObj) {
     }
 }
 
+async function getAllMsgs(GCI) {
+    try {
 
+        let { state } = await connect(GCI)
+        let msgList = await state.msgs
+         
+        for (let index in msgList) {
+            let msg = msgList[index]
+            console.log(index, " : ", msg)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 let keyObj = loadOrCreateMyKey()
 
@@ -86,7 +99,7 @@ const pubKeyHex = keyObj.pubKeyHex
 const privKeyHex = keyObj.privKeyHex
 
 
-const data = Buffer.from('trois message message')
+const data = Buffer.from('new message long new message long new message long new message long new message long new message long new message long new message long new message long new message long')
 
 let encryptedMsgByte = encrypt(pubKeyHex, data)
 let encryptedMsgBase64 = encryptedMsgByte.toString('base64');
@@ -96,7 +109,7 @@ let decryptedMsg = decrypt(privKeyHex, newEncryptedMsgByte).toString()
 
 console.log(keyObj)
 
-let GCI = 'dca64a4ba521d721d572654ec4e0e50721945549417fd07a8e605977213c15d5'
+let GCI = '2e2d1a0f7c4391e65cd9bf2331570fcf8c48e4b82c26d9d14bb52328a4c5b49c'
 
 let addMsg = {
     command: "send",
@@ -112,7 +125,11 @@ let delMsg = {
     signature: ""
 }
 
-getAddrMsgs(GCI, keyObj)
+
 
 sendMsg(GCI, addMsg)
+
+getAddrMsgs(GCI, keyObj)
+
+//getAllMsgs(GCI)
 //deleteMsg(GCI, delMsg)
