@@ -2,20 +2,6 @@ let { connect } = require('lotion')
 let { encrypt, decrypt, PrivateKey } = require('eciesjs')
 const fs = require('fs');
 
-const privKey = new PrivateKey()
-const privKeyHex = privKey.toHex()
-const pubKey = privKey.publicKey
-const pubKeyHex = pubKey.toHex()
-
-
-const data = Buffer.from('trois message message')
-
-let encryptedMsgByte = encrypt(pubKeyHex, data)
-let encryptedMsgBase64 = encryptedMsgByte.toString('base64');
-
-let newEncryptedMsgByte = new Buffer.from(encryptedMsgBase64, 'base64');
-let decryptedMsg = decrypt(privKeyHex, newEncryptedMsgByte).toString()
-
 
 function loadOrCreateMyKey() {
     try {
@@ -78,7 +64,7 @@ async function getAddrMsgs(GCI, keyObj) {
         let msgList = msgs[keyObj.pubKeyHex]
         for (let index in msgList) {
             let msg = msgList[index]
-            console.log(msg)
+            console.log(index, " : ", msg)
             let decriptefm = decryptMsg(msg.encryptedMsg, keyObj.privKeyHex)
             console.log(decriptefm)
         }
@@ -87,25 +73,45 @@ async function getAddrMsgs(GCI, keyObj) {
     }
 }
 
-let GCI = 'c36a607b5a2cc75f6974e18f5d2496df15894dedb558f50393656e4175103db3'
+
+
+let keyObj = loadOrCreateMyKey()
+
+// const privKey = new PrivateKey()
+// const privKeyHex = privKey.toHex()
+// const pubKey = privKey.publicKey
+// const pubKeyHex = pubKey.toHex()
+
+const pubKeyHex = keyObj.pubKeyHex
+const privKeyHex = keyObj.privKeyHex
+
+
+const data = Buffer.from('trois message message')
+
+let encryptedMsgByte = encrypt(pubKeyHex, data)
+let encryptedMsgBase64 = encryptedMsgByte.toString('base64');
+
+let newEncryptedMsgByte = new Buffer.from(encryptedMsgBase64, 'base64');
+let decryptedMsg = decrypt(privKeyHex, newEncryptedMsgByte).toString()
+
+console.log(keyObj)
+
+let GCI = 'dca64a4ba521d721d572654ec4e0e50721945549417fd07a8e605977213c15d5'
 
 let addMsg = {
-    command: "add",
-    pubKeyHex: pubKeyHex,
-    privKeyHex: privKeyHex,
-    encryptedMsg: encryptedMsgBase64,
-    decryptedMsg: decryptedMsg
+    command: "send",
+    from: pubKeyHex,
+    to: pubKeyHex,
+    msg: encryptedMsgBase64
 }
 
 let delMsg = {
     command: "delete",
     pubKeyHex: pubKeyHex,
+    date: "",
     signature: ""
 }
 
-let keyObj = loadOrCreateMyKey()
-console.log(keyObj)
-console.log(keyObj.pubKeyHex)
 getAddrMsgs(GCI, keyObj)
 
 sendMsg(GCI, addMsg)

@@ -11,12 +11,11 @@ app.use(function(state, tx) {
     let msg = JSON.parse(tx.nonce)
     let newMsg = {}
     newMsg[Date.now()] = {
-        privKeyHex: msg.privKeyHex,
-        encryptedMsg: msg.encryptedMsg,
-        decryptedMsg: msg.decryptedMsg
+        from: msg.from,
+        msg: msg.msg
     }
-    if(msg.command === "add") {
-        state.msgs[msg.pubKeyHex] = newMsg
+    if(msg.command === "send") {
+        state.msgs[msg.to] = newMsg
     }
 
     if(msg.command === "delete") {
