@@ -1,5 +1,6 @@
 let { connect } = require('lotion')
 let { encrypt, decrypt, PrivateKey } = require('eciesjs')
+const fs = require('fs');
 
 const privKey = new PrivateKey()
 const privKeyHex = privKey.toHex()
@@ -16,7 +17,22 @@ let newEncryptedMsgByte = new Buffer.from(encryptedMsgBase64, 'base64');
 let decryptedMsg = decrypt(privKeyHex, newEncryptedMsgByte).toString()
 
 
-
+function loadOrCreateMyKey() {
+    try {
+        let keyFile = fs.readFileSync("key.json", 'utf8', 'r')
+        let keyObj = JSON.parse(keyFile)
+        return keyObj
+    } catch {
+        console.log("error reading key from file... lets try to kreate one")
+        let keyObj = {
+            pubKeyHex: "03eed0fccc5cc378cf5ff85b507aa08eb0ac2d27748cc1d0c4a54c4517324b44f3",
+            privKeyHex: "0x89175badda50ad5467983a4d62008df9d9ded1cddf8649650ea8ad08c07cef32"
+        } 
+        let keyData = JSON.stringify(keyObj)
+        fs.writeFileSync("key.json", keyData)
+        return keyObj
+    }
+}
 
 function decryptMsg(encryptedMsgBase64, privKeyHex) {
 
@@ -54,21 +70,24 @@ async function deleteMsg(GCI, delMsg) {
     }
 }
 
-async function getAddrMsgs(GCI, pubKeyHex) {
+async function getAddrMsgs(GCI, keyObj) {
     try {
 
         let { state } = await connect(GCI)
         let msgs = await state.msgs
-        let msg = msgs[pubKeyHex]
-        console.log(msg["1678284496184"])
-        let decriptefm = decryptMsg(msg["1678284496184"].encryptedMsg, msg["1678284496184"].privKeyHex)
-        console.log(decriptefm)
+        let msgList = msgs[keyObj.pubKeyHex]
+        for (let index in msgList) {
+            let msg = msgList[index]
+            console.log(msg)
+            let decriptefm = decryptMsg(msg.encryptedMsg, keyObj.privKeyHex)
+            console.log(decriptefm)
+        }
     } catch (error) {
         console.log(error)
     }
 }
 
-let GCI = '1ec39df362c2727070b4f1a2a969ae4c79c85f807e4760ad39fea74cf17bfa5a'
+let GCI = 'c36a607b5a2cc75f6974e18f5d2496df15894dedb558f50393656e4175103db3'
 
 let addMsg = {
     command: "add",
@@ -84,6 +103,10 @@ let delMsg = {
     signature: ""
 }
 
+let keyObj = loadOrCreateMyKey()
+console.log(keyObj)
+console.log(keyObj.pubKeyHex)
+getAddrMsgs(GCI, keyObj)
+
 sendMsg(GCI, addMsg)
 //deleteMsg(GCI, delMsg)
-getAddrMsgs(GCI, "026f49cb9f27bc1f82b35786796de9f3fdb3be6d4f008d43a1cfc3a2ac2186d063")
