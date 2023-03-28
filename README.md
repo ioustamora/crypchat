@@ -18,7 +18,7 @@ thinking about it...
 
 # donate
 
-ltc: ltc1q6at7x2jnq69vv53epf47emjnyvc9grgmmluh7s
+ltc1q6at7x2jnq69vv53epf47emjnyvc9grgmmluh7s
 
 donate! if you need this project live)
 
